@@ -1,0 +1,166 @@
+import { createServerClient } from "@/lib/supabase/server"
+import { streamText } from "ai"
+import { google } from "@ai-sdk/google"
+
+// export const runtime = "edge"
+
+const SYSTEM_PROMPT = `Eres un Asistente de Ventas Inteligente y Persuasivo. Tu objetivo es ayudar a los profesionales de ventas a:
+
+- Desarrollar estrategias de ventas efectivas
+- Analizar perfiles de clientes y oportunidades
+- Preparar presentaciones y propuestas comerciales
+- Manejar objeciones de manera profesional
+- Cerrar más negocios con técnicas probadas
+
+Características de tu personalidad:
+- Profesional pero cercano
+- Experto en técnicas de ventas modernas
+- Proporciona ejemplos prácticos y accionables
+- Usa formato markdown para estructurar tus respuestas
+- Haces preguntas estratégicas para entender mejor las necesidades
+
+Responde siempre en español y mantén un tono motivador y orientado a resultados.`
+
+export async function POST(request: Request) {
+  try {
+    // Obtener la sesión del usuario usando Supabase SSR
+    const supabase = await createServerClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return new Response(JSON.stringify({ error: "No autorizado" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      })
+    }
+
+    const { chatId, messages: clientMessages } = await request.json()
+
+    // Si no hay chatId, crear una nueva conversación
+    let conversationId = chatId
+
+    if (!conversationId) {
+      // Generar título basado en el primer mensaje del usuario
+      const firstUserMessage = clientMessages.find((m: any) => m.role === "user")
+      const title = firstUserMessage
+        ? firstUserMessage.content.slice(0, 50) + (firstUserMessage.content.length > 50 ? "..." : "")
+        : "Nueva conversación"
+
+      const { data: newConversation, error: createError } = await supabase
+        .from("conversations")
+        .insert({
+          user_id: user.id,
+          title,
+        })
+        .select()
+        .single()
+
+      if (createError) {
+        console.error("[v0] Error creating conversation:", createError)
+        return new Response(JSON.stringify({ error: "Error al crear la conversación" }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        })
+      }
+
+      conversationId = newConversation.id
+    }
+
+    // PASO 1: Recuperar los últimos 10 mensajes de la conversación para contexto
+    const { data: historyMessages, error: historyError } = await supabase
+      .from("messages")
+      .select("role, content, created_at")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true })
+      .limit(10)
+
+    if (historyError) {
+      console.error("[v0] Error fetching history:", historyError)
+    }
+
+    // Construir el historial de mensajes para la IA
+    const messageHistory =
+      historyMessages?.map((msg) => ({
+        role: msg.role as "user" | "assistant",
+        content: msg.content,
+      })) || []
+
+    // Obtener el último mensaje del usuario
+    const lastUserMessage = clientMessages[clientMessages.length - 1]
+
+    // PASO 2: Guardar el mensaje del usuario en la base de datos
+    const { error: userMessageError } = await supabase.from("messages").insert({
+      conversation_id: conversationId,
+      user_id: user.id,
+      role: "user",
+      content: lastUserMessage.content,
+    })
+
+    if (userMessageError) {
+      console.error("[v0] Error saving user message:", userMessageError)
+      return new Response(JSON.stringify({ error: "Error al guardar el mensaje" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      })
+    }
+
+    // PASO 3: Llamar a Gemini usando el provider de Google con API key
+    // Actualizado a gemini-2.5-flash según documentación oficial
+    const result = streamText({
+      model: google("gemini-2.5-flash", {
+        apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+      }),
+      system: SYSTEM_PROMPT,
+      messages: [
+        ...messageHistory,
+        {
+          role: "user",
+          content: lastUserMessage.content,
+        },
+      ],
+      // PASO 4: Guardar la respuesta completa de la IA cuando termine
+      onFinish: async ({ text }) => {
+        try {
+          // Guardar el mensaje del asistente
+          const { error: assistantMessageError } = await supabase.from("messages").insert({
+            conversation_id: conversationId,
+            user_id: user.id,
+            role: "assistant",
+            content: text,
+          })
+
+          if (assistantMessageError) {
+            console.error("[v0] Error saving assistant message:", assistantMessageError)
+          }
+
+          // Actualizar el timestamp de la conversación
+          const { error: updateError } = await supabase
+            .from("conversations")
+            .update({ updated_at: new Date().toISOString() })
+            .eq("id", conversationId)
+
+          if (updateError) {
+            console.error("[v0] Error updating conversation:", updateError)
+          }
+        } catch (error) {
+          console.error("[v0] Error in onFinish:", error)
+        }
+      },
+    })
+
+    // Retornar el stream con el chatId
+    return result.toUIMessageStreamResponse({
+      headers: {
+        "X-Chat-Id": conversationId,
+      },
+    })
+  } catch (error) {
+    console.error("[v0] Error in chat API:", error)
+    return new Response(JSON.stringify({ error: "Error interno del servidor" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    })
+  }
+}
