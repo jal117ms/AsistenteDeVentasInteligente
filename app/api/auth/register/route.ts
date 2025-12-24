@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
             user: data.user,
             message: data.user?.email_confirmed_at
                 ? "Cuenta creada exitosamente"
-                : "Cuenta creada. Revisa tu email para confirmar tu cuenta.",
+                : "Cuenta creada exitosamente",
         })
     } catch (error) {
         console.error("[API] Error in register:", error)

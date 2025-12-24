@@ -18,6 +18,9 @@ export type ApiResponse<T> = {
     error?: string
 }
 
+
+
+
 class ApiClient {
     private async fetchWithAuth(url: string, options: RequestInit = {}) {
         const response = await fetch(url, {

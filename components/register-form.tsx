@@ -85,7 +85,7 @@ export function RegisterForm() {
       )}
       {success && (
         <div className="text-sm text-green-500 bg-green-500/10 border border-green-500/20 rounded-md p-3">
-          ¡Cuenta creada! Revisa tu email para confirmar tu cuenta.
+          ¡Cuenta creada!.
         </div>
       )}
       <Button type="submit" className="w-full" disabled={isLoading}>

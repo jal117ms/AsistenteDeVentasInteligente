@@ -4,22 +4,29 @@ import { google } from "@ai-sdk/google"
 
 // export const runtime = "edge"
 
-const SYSTEM_PROMPT = `Eres un Asistente de Ventas Inteligente y Persuasivo. Tu objetivo es ayudar a los profesionales de ventas a:
+const SYSTEM_PROMPT = `
+Eres un Asistente de Ventas y Soporte Inteligente. Tu rol es interactuar con clientes potenciales de manera ágil, profesional y persuasiva.
 
-- Desarrollar estrategias de ventas efectivas
-- Analizar perfiles de clientes y oportunidades
-- Preparar presentaciones y propuestas comerciales
-- Manejar objeciones de manera profesional
-- Cerrar más negocios con técnicas probadas
+CONTEXTO:
+Eres un experto generalista. Te adaptas dinámicamente al tipo de producto o servicio por el que pregunte el usuario (tecnología, moda, servicios, etc.).
 
-Características de tu personalidad:
-- Profesional pero cercano
-- Experto en técnicas de ventas modernas
-- Proporciona ejemplos prácticos y accionables
-- Usa formato markdown para estructurar tus respuestas
-- Haces preguntas estratégicas para entender mejor las necesidades
+REGLAS DE RESPUESTA (STRICT):
+1. BREVEDAD: Tus respuestas deben ser concisas. Evita saludos largos o despedidas repetitivas. Ve al grano.
+2. ESTRUCTURA: Usa siempre formato Markdown para facilitar la lectura visual:
+   - Usa **negritas** para resaltar beneficios clave o datos importantes.
+   - Usa listas (bullet points) para enumerar características o pasos de soporte.
+3. OBJETIVO:
+   - Si el usuario muestra interés: Identifica su necesidad -> Ofrece una solución atractiva -> Invita a la acción (Cierre).
+   - Si el usuario tiene un problema: Empatiza rápidamente -> Da la solución paso a paso.
 
-Responde siempre en español y mantén un tono motivador y orientado a resultados.`
+TONO:
+- Seguro, servicial y moderno.
+- No suenes como un robot antiguo. Usa lenguaje natural pero profesional.
+
+IDIOMA:
+- Responde siempre en español neutro.
+`
+
 
 export async function POST(request: Request) {
   try {
@@ -68,7 +75,7 @@ export async function POST(request: Request) {
       conversationId = newConversation.id
     }
 
-    // PASO 1: Recuperar los últimos 10 mensajes de la conversación para contexto
+    // Recuperar los últimos 10 mensajes de la conversación para contexto
     const { data: historyMessages, error: historyError } = await supabase
       .from("messages")
       .select("role, content, created_at")
@@ -90,7 +97,7 @@ export async function POST(request: Request) {
     // Obtener el último mensaje del usuario
     const lastUserMessage = clientMessages[clientMessages.length - 1]
 
-    // PASO 2: Guardar el mensaje del usuario en la base de datos
+    //Guardar el mensaje del usuario en la base de datos
     const { error: userMessageError } = await supabase.from("messages").insert({
       conversation_id: conversationId,
       user_id: user.id,
@@ -106,7 +113,7 @@ export async function POST(request: Request) {
       })
     }
 
-    // PASO 3: Llamar a Gemini usando el provider de Google con API key
+    // Llamar a Gemini usando el provider de Google con API key
     // Actualizado a gemini-2.5-flash según documentación oficial
     const result = streamText({
       model: google("gemini-2.5-flash", {
@@ -120,7 +127,10 @@ export async function POST(request: Request) {
           content: lastUserMessage.content,
         },
       ],
-      // PASO 4: Guardar la respuesta completa de la IA cuando termine
+
+
+
+      // Guardar la respuesta completa de la IA cuando termine
       onFinish: async ({ text }) => {
         try {
           // Guardar el mensaje del asistente
@@ -149,6 +159,9 @@ export async function POST(request: Request) {
         }
       },
     })
+
+
+
 
     // Retornar el stream con el chatId
     return result.toDataStreamResponse({
