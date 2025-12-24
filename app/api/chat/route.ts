@@ -151,7 +151,7 @@ export async function POST(request: Request) {
     })
 
     // Retornar el stream con el chatId
-    return result.toUIMessageStreamResponse({
+    return result.toDataStreamResponse({
       headers: {
         "X-Chat-Id": conversationId,
       },

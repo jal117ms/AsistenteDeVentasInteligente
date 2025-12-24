@@ -1,13 +1,12 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { apiClient } from "@/lib/api-client"
 
 export function LoginForm() {
   const router = useRouter()
@@ -21,15 +20,8 @@ export function LoginForm() {
     setIsLoading(true)
     setError(null)
 
-    const supabase = createBrowserClient()
-
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) throw error
+      await apiClient.login(email, password)
 
       // Navigate to chat on success
       router.push("/chat")

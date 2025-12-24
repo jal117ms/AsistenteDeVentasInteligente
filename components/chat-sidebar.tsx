@@ -1,27 +1,21 @@
 "use client"
 
 import type React from "react"
-
 import { useRouter } from "next/navigation"
 import type { User } from "@supabase/supabase-js"
+import type { Conversation } from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { PlusCircle, MessageSquare, LogOut, X, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { createBrowserClient } from "@/lib/supabase/client"
 import { useState } from "react"
-
-type Chat = {
-  id: string
-  title: string
-  lastMessage: Date
-}
 
 type ChatSidebarProps = {
   isOpen: boolean
   onClose: () => void
-  chats: Chat[]
+  chats: Conversation[]
   user: User
   onNewChat: () => void
   onSelectChat: (chatId: string) => void
@@ -43,10 +37,13 @@ export function ChatSidebar({
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null)
 
   const handleLogout = async () => {
-    const supabase = createBrowserClient()
-    await supabase.auth.signOut()
-    router.push("/")
-    router.refresh()
+    try {
+      await apiClient.logout()
+      router.push("/")
+      router.refresh()
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error)
+    }
   }
 
   const handleDeleteChat = async (chatId: string, e: React.MouseEvent) => {
@@ -59,13 +56,7 @@ export function ChatSidebar({
     setDeletingChatId(chatId)
 
     try {
-      const response = await fetch(`/api/conversations/${chatId}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Error al eliminar el chat")
-      }
+      await apiClient.deleteConversation(chatId)
 
       onChatDeleted()
 

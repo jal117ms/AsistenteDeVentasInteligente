@@ -1,13 +1,12 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { apiClient } from "@/lib/api-client"
 
 export function RegisterForm() {
   const router = useRouter()
@@ -24,21 +23,8 @@ export function RegisterForm() {
     setError(null)
     setSuccess(false)
 
-    const supabase = createBrowserClient()
-
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/chat`,
-          data: {
-            name: name,
-          },
-        },
-      })
-
-      if (error) throw error
+      const response = await apiClient.register(email, password, name)
 
       // Show success message
       setSuccess(true)

@@ -119,7 +119,20 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    height: 100%;
+  }
+
   body {
     @apply bg-background text-foreground;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* Asegurar que el scroll funcione correctamente en el área de mensajes */
+  [data-slot="scroll-area-viewport"] {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
   }
 }

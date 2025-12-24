@@ -3,19 +3,14 @@
 import { useState, useEffect } from "react"
 import { useChat } from "ai/react"
 import type { User } from "@supabase/supabase-js"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { apiClient } from "@/lib/api-client"
+import type { Conversation } from "@/lib/api-client"
 import { ChatSidebar } from "@/components/chat-sidebar"
 import { ChatHeader } from "@/components/chat-header"
 import { ChatMessages } from "@/components/chat-messages"
 import { ChatInput } from "@/components/chat-input"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
-
-type Chat = {
-  id: string
-  title: string
-  lastMessage: Date
-}
 
 type ChatPageClientProps = {
   user: User
@@ -24,8 +19,8 @@ type ChatPageClientProps = {
 export function ChatPageClient({ user }: ChatPageClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [currentChatId, setCurrentChatId] = useState<string | null>(null)
-  const [chats, setChats] = useState<Chat[]>([])
-  const supabase = createBrowserClient()
+  const [chats, setChats] = useState<Conversation[]>([])
+  const [isLoadingChats, setIsLoadingChats] = useState(false)
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: "/api/chat",
@@ -51,24 +46,15 @@ export function ChatPageClient({ user }: ChatPageClientProps) {
   })
 
   const loadChats = async () => {
-    const { data, error } = await supabase
-      .from("conversations")
-      .select("id, title, updated_at")
-      .order("updated_at", { ascending: false })
-      .limit(20)
-
-    if (error) {
+    try {
+      setIsLoadingChats(true)
+      const conversations = await apiClient.getConversations()
+      setChats(conversations)
+    } catch (error) {
       console.error("[v0] Error loading chats:", error)
-      return
+    } finally {
+      setIsLoadingChats(false)
     }
-
-    setChats(
-      data.map((chat) => ({
-        id: chat.id,
-        title: chat.title,
-        lastMessage: new Date(chat.updated_at),
-      })),
-    )
   }
 
   useEffect(() => {
@@ -88,37 +74,32 @@ export function ChatPageClient({ user }: ChatPageClientProps) {
   }
 
   const handleLoadChat = async (chatId: string) => {
-    setCurrentChatId(chatId)
+    try {
+      setCurrentChatId(chatId)
 
-    // Cargar los mensajes de la conversación
-    const { data, error } = await supabase
-      .from("messages")
-      .select("id, role, content, created_at")
-      .eq("conversation_id", chatId)
-      .order("created_at", { ascending: true })
+      // Cargar los mensajes de la conversación usando API
+      const messages = await apiClient.getMessages(chatId)
 
-    if (error) {
+      setMessages([
+        {
+          id: "welcome",
+          role: "assistant",
+          content:
+            "¡Hola! Soy tu **Asistente de Ventas Inteligente**. Estoy aquí para ayudarte con:\n\n- Estrategias de ventas\n- Análisis de clientes\n- Preparación de presentaciones\n- Respuestas a objeciones\n\n¿En qué puedo ayudarte hoy?",
+        },
+        ...messages.map((msg) => ({
+          id: msg.id,
+          role: msg.role as "user" | "assistant",
+          content: msg.content,
+        })),
+      ])
+    } catch (error) {
       console.error("[v0] Error loading messages:", error)
-      return
     }
-
-    setMessages([
-      {
-        id: "welcome",
-        role: "assistant",
-        content:
-          "¡Hola! Soy tu **Asistente de Ventas Inteligente**. Estoy aquí para ayudarte con:\n\n- Estrategias de ventas\n- Análisis de clientes\n- Preparación de presentaciones\n- Respuestas a objeciones\n\n¿En qué puedo ayudarte hoy?",
-      },
-      ...data.map((msg) => ({
-        id: msg.id,
-        role: msg.role as "user" | "assistant",
-        content: msg.content,
-      })),
-    ])
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-dvh bg-background">
       {/* Sidebar */}
       <ChatSidebar
         isOpen={sidebarOpen}
@@ -132,7 +113,7 @@ export function ChatPageClient({ user }: ChatPageClientProps) {
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full">
         {/* Mobile Menu Button */}
         <div className="lg:hidden flex items-center gap-2 p-4 border-b border-border bg-card">
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
