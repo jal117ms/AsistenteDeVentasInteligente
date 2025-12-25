@@ -18,51 +18,135 @@ export type ApiResponse<T> = {
     error?: string
 }
 
+import { createAppError, type AppError } from './error-handler'
+
 
 
 
 class ApiClient {
     private async fetchWithAuth(url: string, options: RequestInit = {}) {
-        const response = await fetch(url, {
-            ...options,
-            headers: {
-                "Content-Type": "application/json",
-                ...options.headers,
-            },
-        })
+        try {
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    "Content-Type": "application/json",
+                    ...options.headers,
+                },
+            })
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: "Error de conexión" }))
-            throw new Error(errorData.error || `HTTP ${response.status}`)
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({
+                    error: response.status === 401 ? "Sesión expirada" : "Error de conexión"
+                }))
+
+                // Crear error personalizado con más información
+                throw createAppError(errorData.error || `HTTP ${response.status}`, {
+                    status: response.status,
+                    isAuthError: response.status === 401
+                })
+            }
+
+            return response.json()
+        } catch (error) {
+            // Si es un AppError, re-lanzarlo
+            if ((error as AppError).message !== undefined) {
+                throw error
+            }
+
+            // Si es un error de red o fetch
+            if (error instanceof TypeError) {
+                throw createAppError("Error de conexión a internet", {
+                    status: 0,
+                    isNetworkError: true,
+                    originalError: error
+                })
+            }
+
+            // Para otros errores desconocidos
+            throw createAppError("Error inesperado", {
+                originalError: error
+            })
         }
-
-        return response.json()
     }
 
     // Conversaciones
     async getConversations(): Promise<Conversation[]> {
-        const response = await this.fetchWithAuth("/api/conversations")
-        return response.conversations
+        try {
+            const response = await this.fetchWithAuth("/api/conversations")
+            return response.conversations || []
+        } catch (error: AppError | any) {
+            // Agregar contexto al error
+            const contextError = createAppError(error.message || "Error desconocido", {
+                ...error,
+                context: 'conversations'
+            })
+            throw contextError
+        }
     }
 
     async createConversation(title?: string): Promise<Conversation> {
-        const response = await this.fetchWithAuth("/api/conversations", {
-            method: "POST",
-            body: JSON.stringify({ title }),
-        })
-        return response.conversation
+        try {
+            const response = await this.fetchWithAuth("/api/conversations", {
+                method: "POST",
+                body: JSON.stringify({ title }),
+            })
+            return response.conversation
+        } catch (error: AppError | any) {
+            const contextError = createAppError(error.message || "Error desconocido", {
+                ...error,
+                context: 'create-conversation'
+            })
+            throw contextError
+        }
     }
 
     async deleteConversation(id: string): Promise<void> {
-        await this.fetchWithAuth(`/api/conversations/${id}`, {
-            method: "DELETE",
-        })
+        try {
+            await this.fetchWithAuth(`/api/conversations/${id}`, {
+                method: "DELETE",
+            })
+        } catch (error: AppError | any) {
+            const contextError = createAppError(error.message || "Error desconocido", {
+                ...error,
+                context: 'delete-conversation',
+                conversationId: id
+            })
+            throw contextError
+        }
     }
 
     // Mensajes
     async getMessages(conversationId: string): Promise<Message[]> {
-        const response = await this.fetchWithAuth(`/api/conversations/${conversationId}/messages`)
-        return response.messages
+        try {
+            const response = await this.fetchWithAuth(`/api/conversations/${conversationId}/messages`)
+            return response.messages || []
+        } catch (error: AppError | any) {
+            // Agregar contexto al error
+            const contextError = createAppError(error.message || "Error desconocido", {
+                ...error,
+                context: 'messages',
+                conversationId
+            })
+            throw contextError
+        }
+    }
+
+    async createMessage(conversationId: string, role: "user" | "assistant", content: string): Promise<Message> {
+        try {
+            const response = await this.fetchWithAuth(`/api/conversations/${conversationId}/messages`, {
+                method: "POST",
+                body: JSON.stringify({ role, content }),
+            })
+            return response.message
+        } catch (error: AppError | any) {
+            // Agregar contexto al error
+            const contextError = createAppError(error.message || "Error desconocido", {
+                ...error,
+                context: 'create-message',
+                conversationId
+            })
+            throw contextError
+        }
     }
 
     // Autenticación

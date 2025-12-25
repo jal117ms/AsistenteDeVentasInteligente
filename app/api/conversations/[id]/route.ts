@@ -4,6 +4,11 @@ import { createServerClient } from "@/lib/supabase/server"
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
+
+    if (!id) {
+      return NextResponse.json({ error: "ID de conversación requerido" }, { status: 400 })
+    }
+
     const supabase = await createServerClient()
 
     // Verificar autenticación

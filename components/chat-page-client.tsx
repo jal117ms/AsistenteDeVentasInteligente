@@ -5,6 +5,7 @@ import { useChat } from "ai/react"
 import type { User } from "@supabase/supabase-js"
 import { apiClient } from "@/lib/api-client"
 import type { Conversation } from "@/lib/api-client"
+import { handleAuthError, getErrorMessage, type AppError } from "@/lib/error-handler"
 import { ChatSidebar } from "@/components/chat-sidebar"
 import { ChatHeader } from "@/components/chat-header"
 import { ChatMessages } from "@/components/chat-messages"
@@ -50,8 +51,13 @@ export function ChatPageClient({ user }: ChatPageClientProps) {
       setIsLoadingChats(true)
       const conversations = await apiClient.getConversations()
       setChats(conversations)
-    } catch (error) {
+    } catch (error: AppError | any) {
       console.error("[v0] Error loading chats:", error)
+
+      // Manejar error de autenticación automáticamente
+      if (!handleAuthError(error, 1000)) {
+        console.warn("No se pudieron cargar las conversaciones:", getErrorMessage(error))
+      }
     } finally {
       setIsLoadingChats(false)
     }
@@ -77,6 +83,15 @@ export function ChatPageClient({ user }: ChatPageClientProps) {
     try {
       setCurrentChatId(chatId)
 
+      // Mostrar estado de carga
+      setMessages([
+        {
+          id: "loading",
+          role: "assistant",
+          content: "Cargando conversación...",
+        },
+      ])
+
       // Cargar los mensajes de la conversación usando API
       const messages = await apiClient.getMessages(chatId)
 
@@ -93,8 +108,21 @@ export function ChatPageClient({ user }: ChatPageClientProps) {
           content: msg.content,
         })),
       ])
-    } catch (error) {
+    } catch (error: AppError | any) {
       console.error("[v0] Error loading messages:", error)
+
+      // Mostrar mensaje de error específico al usuario
+      const errorMessage = getErrorMessage(error)
+      setMessages([
+        {
+          id: "error",
+          role: "assistant",
+          content: `❌ **Error:** ${errorMessage}`,
+        },
+      ])
+
+      // Manejar error de autenticación automáticamente
+      handleAuthError(error, 3000)
     }
   }
 
