@@ -17,7 +17,18 @@ export async function POST(request: NextRequest) {
         })
 
         if (error) {
-            return NextResponse.json({ error: error.message }, { status: 400 })
+            // Mapear errores de Supabase a mensajes más amigables
+            let errorMessage = "Email o contraseña incorrectos"
+            
+            if (error.message.includes('Email not confirmed')) {
+                errorMessage = "Debes confirmar tu email antes de iniciar sesión"
+            } else if (error.message.includes('Invalid login credentials')) {
+                errorMessage = "Email o contraseña incorrectos"
+            } else if (error.message.includes('Too many requests')) {
+                errorMessage = "Demasiados intentos. Intenta nuevamente en unos minutos"
+            }
+            
+            return NextResponse.json({ error: errorMessage }, { status: 400 })
         }
 
         return NextResponse.json({

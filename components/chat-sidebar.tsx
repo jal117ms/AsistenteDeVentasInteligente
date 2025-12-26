@@ -8,6 +8,8 @@ import { apiClient } from "@/lib/api-client"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { Logo } from "@/components/logo"
 import { PlusCircle, MessageSquare, LogOut, X, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
@@ -116,10 +118,23 @@ export function ChatSidebar({
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 20px)' }}
       >
         {/* Header en móvil */}
-        <div className="lg:hidden flex justify-end p-2 flex-shrink-0">
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
-            <X className="h-4 w-4" />
-          </Button>
+        <div className="lg:hidden flex justify-between items-center p-2 flex-shrink-0 border-b border-border">
+          <div className="flex items-center gap-2">
+            <Logo size="sm" />
+            <span className="text-sm font-medium text-foreground">Asistente</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Header con logo para desktop */}
+        <div className="hidden lg:flex items-center gap-2 p-4 border-b border-border flex-shrink-0">
+          <Logo size="md" />
+          <h2 className="font-semibold text-foreground text-sm">Asistente de Ventas</h2>
         </div>
 
         {/* Botones principales */}
