@@ -2,7 +2,7 @@
 
 Un asistente de IA especializado en estrategias de ventas, análisis de clientes y soporte comercial construido con Next.js, Supabase y tecnologías modernas.
 
-![Asistente de Ventas](https://img.shields.io/badge/Next.js-16.0.10-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue) ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1.9-38bdf8) ![Supabase](https://img.shields.io/badge/Supabase-2.48.0-green)
+![Asistente de Ventas](https://img.shields.io/badge/Next.js) ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue) ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1.9-38bdf8) ![Supabase](https://img.shields.io/badge/Supabase-2.48.0-green)
 
 ## ✨ Características
 
@@ -16,10 +16,10 @@ Un asistente de IA especializado en estrategias de ventas, análisis de clientes
 
 ## 🛠️ Tecnologías
 
-- **Frontend**: Next.js 16, React 19, TypeScript
-- **Styling**: Tailwind CSS 4, Radix UI, Lucide Icons
+- **Frontend**: Next.js, TypeScript
+- **Styling**: Tailwind CSS, Radix UI, Lucide Icons
 - **Base de Datos**: Supabase (PostgreSQL)
-- **IA**: Google AI SDK (@ai-sdk/google)
+- **IA**: AI SDK (@ai-sdk/google)
 - **Autenticación**: Supabase Auth
 - **Deployment**: Vercel (recomendado)
 
@@ -35,7 +35,7 @@ Un asistente de IA especializado en estrategias de ventas, análisis de clientes
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/AsistenteDeVentasInteligente.git
+git clone https://github.com/jal117ms/AsistenteDeVentasInteligente.git
 cd AsistenteDeVentasInteligente
 ```
 
@@ -240,7 +240,7 @@ Este proyecto está bajo la Licencia MIT - ve el archivo [LICENSE](LICENSE) para
 
 ## 📞 Soporte
 
-¿Tienes preguntas? Crea un [issue](https://github.com/tu-usuario/AsistenteDeVentasInteligente/issues) o contacta al equipo de desarrollo.
+¿Tienes preguntas? Crea un [issue](https://github.com/jal117ms/AsistenteDeVentasInteligente/issues) o contacta al equipo de desarrollo.
 
 ---
 
