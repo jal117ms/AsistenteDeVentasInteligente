@@ -223,22 +223,24 @@ export function ChatSidebar({
         </div>
 
         {/* Usuario y cerrar sesión - siempre visible */}
-        <div className="p-2 sm:p-4 border-t border-border flex-shrink-0 bg-card">
-          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <Avatar className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10">
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs sm:text-sm">{userInitials}</AvatarFallback>
+        <div className="p-3 sm:p-4 border-t border-border flex-shrink-0 bg-card/50 backdrop-blur-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <Avatar className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 ring-2 ring-primary/20">
+              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-sm font-semibold">
+                {userInitials}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm font-medium text-foreground truncate">{userName}</p>
-              <p className="text-xs text-muted-foreground truncate hidden sm:block">{userEmail}</p>
+              <p className="text-sm font-semibold text-foreground truncate leading-tight">{userName}</p>
+              <p className="text-xs text-muted-foreground truncate mt-0.5 leading-tight">{userEmail}</p>
             </div>
           </div>
           <Button 
             variant="outline" 
-            className="w-full justify-start gap-2 bg-transparent h-8 sm:h-10 text-xs sm:text-sm" 
+            className="w-full justify-center gap-2 bg-background/50 hover:bg-destructive hover:text-destructive-foreground transition-all duration-200 font-medium border-border/50 hover:border-destructive" 
             onClick={handleLogout}
           >
-            <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
+            <LogOut className="h-4 w-4" />
             Cerrar Sesión
           </Button>
         </div>
