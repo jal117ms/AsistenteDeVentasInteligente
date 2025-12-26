@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     // Llamar a Gemini usando el provider de Google con API key
     // Actualizado a gemini-2.5-flash según documentación oficial
     const result = streamText({
-      model: google("gemini-2.5-flash", {
+      model: google("gemini-2.5-flash-lite", {
         apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
       }),
       system: SYSTEM_PROMPT,
