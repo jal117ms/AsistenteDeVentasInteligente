@@ -110,9 +110,10 @@ export function ChatSidebar({
 
       <aside
         className={cn(
-          "fixed lg:relative inset-y-0 left-0 z-50 w-72 bg-card border-r border-border flex flex-col transition-transform duration-200 lg:translate-x-0 h-screen",
+          "fixed lg:relative inset-y-0 left-0 z-50 w-72 bg-card border-r border-border flex flex-col transition-transform duration-200 lg:translate-x-0 h-[100dvh] pb-safe-bottom",
           isOpen ? "translate-x-0" : "-translate-x-full",
         )}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 20px)' }}
       >
         {/* Header en móvil */}
         <div className="lg:hidden flex justify-end p-2 flex-shrink-0">
@@ -141,9 +142,9 @@ export function ChatSidebar({
         </div>
 
         {/* Área de chats con scroll limitado */}
-        <div className="flex-1 flex flex-col px-2 sm:px-4 min-h-0 overflow-hidden">
+        <div className="flex-1 flex flex-col px-2 sm:px-4 min-h-0 overflow-hidden mb-4">
           <h2 className="text-xs font-semibold text-muted-foreground mb-1 sm:mb-2 px-2 flex-shrink-0">CHATS RECIENTES</h2>
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-hidden max-h-[calc(100vh-300px)]">
             <ScrollArea className="h-full">
               <div className="space-y-1 pr-2 pb-2 sm:pb-4">
                 {chats.length === 0 ? (
@@ -223,24 +224,24 @@ export function ChatSidebar({
         </div>
 
         {/* Usuario y cerrar sesión - siempre visible */}
-        <div className="p-3 sm:p-4 border-t border-border flex-shrink-0 bg-card/50 backdrop-blur-sm">
-          <div className="flex items-center gap-3 mb-3">
-            <Avatar className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 ring-2 ring-primary/20">
-              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-sm font-semibold">
+        <div className="p-2 border-t border-border flex-shrink-0 bg-card/50 backdrop-blur-sm min-h-[120px] flex flex-col justify-center">
+          <div className="flex items-center gap-2 mb-2">
+            <Avatar className="flex-shrink-0 w-8 h-8 ring-2 ring-primary/20">
+              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-xs font-semibold">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate leading-tight">{userName}</p>
-              <p className="text-xs text-muted-foreground truncate mt-0.5 leading-tight">{userEmail}</p>
+              <p className="text-xs font-semibold text-foreground truncate leading-tight">{userName}</p>
+              <p className="text-xs text-muted-foreground truncate leading-tight">{userEmail}</p>
             </div>
           </div>
           <Button 
             variant="outline" 
-            className="w-full justify-center gap-2 bg-background/50 hover:bg-destructive hover:text-destructive-foreground transition-all duration-200 font-medium border-border/50 hover:border-destructive" 
+            className="w-full justify-center gap-1 bg-background/50 hover:bg-destructive hover:text-destructive-foreground transition-all duration-200 font-medium border-border/50 hover:border-destructive h-8 text-xs" 
             onClick={handleLogout}
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-3 w-3" />
             Cerrar Sesión
           </Button>
         </div>
