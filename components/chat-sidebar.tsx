@@ -110,17 +110,19 @@ export function ChatSidebar({
 
       <aside
         className={cn(
-          "fixed lg:relative inset-y-0 left-0 z-50 w-72 bg-card border-r border-border flex flex-col transition-transform duration-200 lg:translate-x-0",
+          "fixed lg:relative inset-y-0 left-0 z-50 w-72 bg-card border-r border-border flex flex-col transition-transform duration-200 lg:translate-x-0 h-screen",
           isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="lg:hidden flex justify-end p-4">
+        {/* Header en móvil */}
+        <div className="lg:hidden flex justify-end p-4 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <div className="p-4">
+        {/* Botones principales */}
+        <div className="p-4 flex-shrink-0">
           <Button className="w-full justify-start gap-2 mb-3" size="lg" onClick={onNewChat}>
             <PlusCircle className="h-5 w-5" />
             Nuevo Chat
@@ -138,81 +140,92 @@ export function ChatSidebar({
           )}
         </div>
 
-        <div className="flex-1 px-4">
-          <h2 className="text-xs font-semibold text-muted-foreground mb-2 px-2">CHATS RECIENTES</h2>
-          <ScrollArea className="h-[calc(100vh-280px)]">
-            <div className="space-y-1">
-              {chats.length === 0 ? (
-                <p className="text-sm text-muted-foreground p-2">No hay chats aún</p>
-              ) : (
-                chats.map((chat) => (
-                  <div
-                    key={chat.id}
-                    className={cn(
-                      "w-full rounded-lg text-sm hover:bg-accent transition-colors group",
-                      currentChatId === chat.id && "bg-accent",
-                    )}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 32px',
-                      gap: '8px',
-                      alignItems: 'center',
-                      padding: '8px 12px'
-                    }}
-                  >
-                    <button
-                      onClick={() => onSelectChat(chat.id)}
-                      className="flex items-center gap-3 text-left"
+        {/* Área de chats con scroll limitado */}
+        <div className="flex-1 flex flex-col px-4 min-h-0 overflow-hidden">
+          <h2 className="text-xs font-semibold text-muted-foreground mb-2 px-2 flex-shrink-0">CHATS RECIENTES</h2>
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="space-y-1 pr-2 pb-4">
+                {chats.length === 0 ? (
+                  <p className="text-sm text-muted-foreground p-2">No hay chats aún</p>
+                ) : (
+                  chats.slice(0, 10).map((chat) => (
+                    <div
+                      key={chat.id}
+                      className={cn(
+                        "w-full rounded-lg text-sm hover:bg-accent transition-colors group",
+                        currentChatId === chat.id && "bg-accent",
+                      )}
                       style={{
-                        minWidth: 0,
-                        overflow: 'hidden'
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 32px',
+                        gap: '8px',
+                        alignItems: 'center',
+                        padding: '8px 12px'
                       }}
                     >
-                      <MessageSquare className="h-4 w-4 text-muted-foreground group-hover:text-foreground flex-shrink-0" />
-                      <span
-                        className="text-foreground"
+                      <button
+                        onClick={() => onSelectChat(chat.id)}
+                        className="flex items-center gap-3 text-left"
                         style={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          display: 'block'
+                          minWidth: 0,
+                          overflow: 'hidden'
                         }}
                       >
-                        {chat.title}
-                      </span>
-                    </button>
+                        <MessageSquare className="h-4 w-4 text-muted-foreground group-hover:text-foreground flex-shrink-0" />
+                        <span
+                          className="text-foreground"
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            display: 'block'
+                          }}
+                        >
+                          {chat.title}
+                        </span>
+                      </button>
 
-                    {/* Botón de eliminar minimalista */}
-                    <button
-                      onClick={(e) => handleDeleteChat(chat.id, e)}
-                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all duration-200 rounded p-1"
-                      style={{
-                        width: '28px',
-                        height: '28px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}
-                      title="Eliminar chat"
-                      disabled={deletingChatId === chat.id}
-                    >
-                      {deletingChatId === chat.id ? (
-                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground border-b-transparent" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </button>
+                      {/* Botón de eliminar minimalista */}
+                      <button
+                        onClick={(e) => handleDeleteChat(chat.id, e)}
+                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all duration-200 rounded p-1"
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}
+                        title="Eliminar chat"
+                        disabled={deletingChatId === chat.id}
+                      >
+                        {deletingChatId === chat.id ? (
+                          <div className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground border-b-transparent" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  ))
+                )}
+                
+                {/* Mostrar indicador si hay más de 10 chats */}
+                {chats.length > 10 && (
+                  <div className="text-xs text-muted-foreground text-center py-2">
+                    Mostrando 10 de {chats.length} chats
                   </div>
-                ))
-              )}
-            </div>
-          </ScrollArea>
+                )}
+              </div>
+            </ScrollArea>
+          </div>
         </div>
 
-        <div className="p-4 border-t border-border mt-auto">
+        {/* Usuario y cerrar sesión - siempre visible */}
+        <div className="p-4 border-t border-border flex-shrink-0 bg-card">
           <div className="flex items-center gap-3 mb-3">
-            <Avatar>
+            <Avatar className="flex-shrink-0">
               <AvatarFallback className="bg-primary text-primary-foreground">{userInitials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
