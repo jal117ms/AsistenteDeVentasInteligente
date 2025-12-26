@@ -115,37 +115,37 @@ export function ChatSidebar({
         )}
       >
         {/* Header en móvil */}
-        <div className="lg:hidden flex justify-end p-4 flex-shrink-0">
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-5 w-5" />
+        <div className="lg:hidden flex justify-end p-2 flex-shrink-0">
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+            <X className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Botones principales */}
-        <div className="p-4 flex-shrink-0">
-          <Button className="w-full justify-start gap-2 mb-3" size="lg" onClick={onNewChat}>
-            <PlusCircle className="h-5 w-5" />
+        <div className="p-2 sm:p-4 flex-shrink-0">
+          <Button className="w-full justify-start gap-2 mb-2 sm:mb-3 h-9 sm:h-10 text-sm" size="lg" onClick={onNewChat}>
+            <PlusCircle className="h-4 w-4 sm:h-5 sm:w-5" />
             Nuevo Chat
           </Button>
           {chats.length > 0 && (
             <Button
               variant="ghost"
-              className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
+              className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive h-8 sm:h-9 text-xs sm:text-sm"
               size="sm"
               onClick={handleDeleteAllChats}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
               Borrar Todo
             </Button>
           )}
         </div>
 
         {/* Área de chats con scroll limitado */}
-        <div className="flex-1 flex flex-col px-4 min-h-0 overflow-hidden">
-          <h2 className="text-xs font-semibold text-muted-foreground mb-2 px-2 flex-shrink-0">CHATS RECIENTES</h2>
+        <div className="flex-1 flex flex-col px-2 sm:px-4 min-h-0 overflow-hidden">
+          <h2 className="text-xs font-semibold text-muted-foreground mb-1 sm:mb-2 px-2 flex-shrink-0">CHATS RECIENTES</h2>
           <div className="flex-1 min-h-0 overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="space-y-1 pr-2 pb-4">
+              <div className="space-y-1 pr-2 pb-2 sm:pb-4">
                 {chats.length === 0 ? (
                   <p className="text-sm text-muted-foreground p-2">No hay chats aún</p>
                 ) : (
@@ -161,7 +161,7 @@ export function ChatSidebar({
                         gridTemplateColumns: '1fr 32px',
                         gap: '8px',
                         alignItems: 'center',
-                        padding: '8px 12px'
+                        padding: '6px 8px'
                       }}
                     >
                       <button
@@ -223,18 +223,22 @@ export function ChatSidebar({
         </div>
 
         {/* Usuario y cerrar sesión - siempre visible */}
-        <div className="p-4 border-t border-border flex-shrink-0 bg-card">
-          <div className="flex items-center gap-3 mb-3">
-            <Avatar className="flex-shrink-0">
-              <AvatarFallback className="bg-primary text-primary-foreground">{userInitials}</AvatarFallback>
+        <div className="p-2 sm:p-4 border-t border-border flex-shrink-0 bg-card">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <Avatar className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10">
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs sm:text-sm">{userInitials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{userName}</p>
-              <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
+              <p className="text-xs sm:text-sm font-medium text-foreground truncate">{userName}</p>
+              <p className="text-xs text-muted-foreground truncate hidden sm:block">{userEmail}</p>
             </div>
           </div>
-          <Button variant="outline" className="w-full justify-start gap-2 bg-transparent" onClick={handleLogout}>
-            <LogOut className="h-4 w-4" />
+          <Button 
+            variant="outline" 
+            className="w-full justify-start gap-2 bg-transparent h-8 sm:h-10 text-xs sm:text-sm" 
+            onClick={handleLogout}
+          >
+            <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
             Cerrar Sesión
           </Button>
         </div>
