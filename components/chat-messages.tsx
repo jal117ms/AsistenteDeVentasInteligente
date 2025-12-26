@@ -30,11 +30,11 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
   }, [messages, isTyping])
 
   return (
-    <div className="flex-1 overflow-hidden min-h-0">
+    <div className="flex-1 overflow-hidden min-h-1">
       <ScrollArea className="h-full">
         <div className="max-w-3xl mx-auto space-y-6 p-4 pb-6 min-h-full">
           {messages.map((message) => (
-            <div key={message.id} className={cn("flex gap-3", message.role === "user" ? "justify-end" : "justify-start")}>
+            <div key={message.id} className={cn("flex gap-3", message.role === "user" ? "justify-end pr-3" : "justify-start pl-1")}>
               {message.role === "assistant" && (
                 <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
                   <AvatarFallback className="bg-accent text-accent-foreground">
@@ -45,8 +45,10 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
 
               <div
                 className={cn(
-                  "rounded-2xl px-2 sm:px-4 py-3 max-w-[90%] sm:max-w-[80%]",
-                  message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
+                  "rounded-2xl px-4 sm:px-4 py-3",
+                  message.role === "user"
+                    ? "bg-primary text-primary-foreground max-w-[75%] sm:max-w-[70%]"
+                    : "bg-muted text-muted-foreground max-w-[65%] sm:max-w-[80%]",
                 )}
               >
                 <div
@@ -63,15 +65,23 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
                       ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
                       ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
                       table: ({ children }) => (
-                        <div className="my-4 w-full -mx-2 sm:mx-0">
-                          <div className="border border-border rounded-lg overflow-hidden mx-1 sm:mx-0">
-                            <div className="overflow-x-scroll">
-                              <table className="min-w-full text-xs">
-                                {children}
-                              </table>
+                        message.role === "user" ? (
+                          <div className="my-2 overflow-x-auto">
+                            <table className="min-w-full text-xs border-collapse">
+                              {children}
+                            </table>
+                          </div>
+                        ) : (
+                          <div className="my-4 w-full -mx-3 sm:mx-0">
+                            <div className="border border-border rounded-lg overflow-hidden mx-2 sm:mx-0">
+                              <div className="overflow-x-scroll">
+                                <table className="min-w-full text-xs">
+                                  {children}
+                                </table>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        )
                       ),
                       thead: ({ children }) => (
                         <thead>{children}</thead>
