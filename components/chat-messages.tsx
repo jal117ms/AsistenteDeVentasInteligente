@@ -45,7 +45,7 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
 
               <div
                 className={cn(
-                  "rounded-2xl px-4 py-3 max-w-[98%] sm:max-w-[80%] min-w-0 overflow-visible",
+                  "rounded-2xl px-2 sm:px-4 py-3 max-w-[90%] sm:max-w-[80%]",
                   message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
                 )}
               >
@@ -63,30 +63,32 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
                       ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
                       ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
                       table: ({ children }) => (
-                        <div className="my-4 -mx-2 sm:-mx-4 px-2 sm:px-4">
-                          <div className="overflow-x-auto">
-                            <table className="w-full border-collapse border border-border rounded-lg">
-                              {children}
-                            </table>
+                        <div className="my-4 w-full -mx-2 sm:mx-0">
+                          <div className="border border-border rounded-lg overflow-hidden mx-1 sm:mx-0">
+                            <div className="overflow-x-scroll">
+                              <table className="min-w-full text-xs">
+                                {children}
+                              </table>
+                            </div>
                           </div>
                         </div>
                       ),
                       thead: ({ children }) => (
-                        <thead className="bg-muted/80">{children}</thead>
+                        <thead>{children}</thead>
                       ),
                       tbody: ({ children }) => (
-                        <tbody className="bg-card">{children}</tbody>
+                        <tbody>{children}</tbody>
                       ),
                       tr: ({ children }) => (
                         <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">{children}</tr>
                       ),
                       th: ({ children }) => (
-                        <th className="px-1 sm:px-3 lg:px-4 py-1 sm:py-2 lg:py-3 text-left font-semibold text-card-foreground border-r border-border/50 last:border-r-0 text-xs sm:text-sm lg:text-sm">
+                        <th className="p-2 bg-gray-100 dark:bg-gray-800 font-bold text-left border-b">
                           {children}
                         </th>
                       ),
                       td: ({ children }) => (
-                        <td className="px-1 sm:px-3 lg:px-4 py-1 sm:py-2 lg:py-3 text-card-foreground border-r border-border/50 last:border-r-0 text-xs sm:text-sm lg:text-sm">
+                        <td className="p-2 border-b">
                           {children}
                         </td>
                       ),

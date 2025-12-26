@@ -133,10 +133,10 @@
 
   /* Transiciones suaves para elementos principales */
   .transition-theme {
-    transition: background-color 0.3s ease, 
-                border-color 0.3s ease, 
-                color 0.3s ease, 
-                box-shadow 0.3s ease;
+    transition: background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease,
+      box-shadow 0.3s ease;
   }
 
   /* Aplicar transiciones a elementos comunes */
@@ -152,9 +152,9 @@
   .border-border,
   .text-foreground,
   .text-muted-foreground {
-    transition: background-color 0.3s ease, 
-                border-color 0.3s ease, 
-                color 0.3s ease;
+    transition: background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease;
   }
 
   /* Asegurar que el scroll funcione correctamente en el área de mensajes */
@@ -209,10 +209,31 @@
     background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.2) 100%);
   }
 
-  /* Controlar desbordamiento de tablas en móvil */
-  @media (max-width: 640px) {
-    .prose table {
-      max-width: calc(100vw - 2rem);
-    }
+  /* Tabla responsiva básica que definitivamente funciona */
+  .prose table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.75rem;
+  }
+
+  .prose table th,
+  .prose table td {
+    border: 1px solid #e5e7eb;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .dark .prose table th,
+  .dark .prose table td {
+    border-color: #374151;
+  }
+
+  .prose table th {
+    background-color: #f9fafb;
+    font-weight: bold;
+  }
+
+  .dark .prose table th {
+    background-color: #1f2937;
   }
 }
