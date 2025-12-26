@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Bot, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 type Message = {
   id: string
@@ -55,11 +56,38 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
                   )}
                 >
                   <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
                     components={{
                       p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                       strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                       ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
                       ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
+                      table: ({ children }) => (
+                        <div className="overflow-x-auto my-4">
+                          <table className="min-w-full border-collapse border border-border rounded-lg overflow-hidden">
+                            {children}
+                          </table>
+                        </div>
+                      ),
+                      thead: ({ children }) => (
+                        <thead className="bg-muted/80">{children}</thead>
+                      ),
+                      tbody: ({ children }) => (
+                        <tbody className="bg-card">{children}</tbody>
+                      ),
+                      tr: ({ children }) => (
+                        <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">{children}</tr>
+                      ),
+                      th: ({ children }) => (
+                        <th className="px-4 py-3 text-left font-semibold text-card-foreground border-r border-border/50 last:border-r-0">
+                          {children}
+                        </th>
+                      ),
+                      td: ({ children }) => (
+                        <td className="px-4 py-3 text-card-foreground border-r border-border/50 last:border-r-0">
+                          {children}
+                        </td>
+                      ),
                     }}
                   >
                     {message.content}
