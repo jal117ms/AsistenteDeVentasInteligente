@@ -208,4 +208,11 @@
   .dark .logo-container {
     background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.2) 100%);
   }
+
+  /* Controlar desbordamiento de tablas en móvil */
+  @media (max-width: 640px) {
+    .prose table {
+      max-width: calc(100vw - 2rem);
+    }
+  }
 }
